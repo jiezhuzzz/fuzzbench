@@ -27,7 +27,11 @@ cd fuzzbench
 
 ## Installing prerequisites
 
-### Docker
+### Docker or Podman
+
+FuzzBench supports both Docker and Podman as container engines.
+
+#### Using Docker
 
 Install Docker using the instructions
 [here](https://docs.docker.com/engine/installation).
@@ -42,10 +46,24 @@ failing you may need to
 [enable BuildKit](https://google.github.io/oss-fuzz/getting-started/new-project-guide/#prerequisites).
 This step is unnecessary on recent Docker releases.
 
-**Note:** Docker images can consume significant disk space. Clean up unused
-docker images periodically. You can do this with
-[docker-cleanup](https://gist.github.com/mikea/d23a839cba68778d94e0302e8a2c200f)
-to garbage collect unused images.
+#### Using Podman
+
+Alternatively, you can use Podman instead of Docker. Install Podman using the
+instructions [here](https://podman.io/getting-started/installation).
+
+To use Podman, set the `CONTAINER_ENGINE` environment variable:
+
+```bash
+export CONTAINER_ENGINE=podman
+```
+
+You can add this to your shell configuration file (e.g., `~/.bashrc` or
+`~/.zshrc`) to make it persistent.
+
+**Note:** Container images can consume significant disk space. Clean up unused
+container images periodically. For Docker, you can use
+[docker-cleanup](https://gist.github.com/mikea/d23a839cba68778d94e0302e8a2c200f).
+For Podman, use `podman system prune` to garbage collect unused images.
 
 ### Make
 

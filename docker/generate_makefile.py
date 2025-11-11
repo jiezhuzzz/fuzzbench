@@ -19,6 +19,7 @@ import sys
 from common import yaml_utils
 from common import benchmark_utils
 from common import fuzzer_utils
+from common import environment
 from experiment.build import docker_images
 
 BASE_TAG = 'gcr.io/fuzzbench'
@@ -41,6 +42,7 @@ def _get_makefile_run_template(image):
     fuzzer = image['fuzzer']
     benchmark = image['benchmark']
     section = ''
+    container_engine = environment.get_container_engine()
 
     run_types = ['run', 'debug', 'test-run', 'debug-builder']
     testcases_dir = os.path.join(BENCHMARK_DIR, benchmark, 'testcases')
@@ -56,7 +58,7 @@ def _get_makefile_run_template(image):
             section += f'.{fuzzer}-{benchmark}-runner\n'
 
         section += f'\
-\tdocker run \\\n\
+\t{container_engine} run \\\n\
 \t--cpus=1 \\\n\
 \t--shm-size=2g \\\n\
 \t--cap-add SYS_NICE \\\n\
@@ -103,6 +105,7 @@ def _get_makefile_run_template(image):
 
 def get_rules_for_image(name, image):
     """Returns makefile section for |image|."""
+    container_engine = environment.get_container_engine()
     if not ('base-' in name or 'dispatcher-' in name or name == 'worker'):
         section = '.'
     else:
@@ -116,8 +119,8 @@ def get_rules_for_image(name, image):
                 section += ' .' + dep
     section += '\n'
     if 'base-' in name:
-        section += '\tdocker pull ubuntu:focal\n'
-    section += '\tdocker build \\\n'
+        section += f'\t{container_engine} pull ubuntu:focal\n'
+    section += f'\t{container_engine} build \\\n'
     section += '\t--tag ' + os.path.join(BASE_TAG, image['tag']) + ' \\\n'
     section += '\t--build-arg BUILDKIT_INLINE_CACHE=1 \\\n'
     section += ('\t--cache-from ' + os.path.join(BASE_TAG, image['tag']) +

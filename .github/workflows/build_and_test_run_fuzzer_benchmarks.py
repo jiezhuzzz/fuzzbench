@@ -17,6 +17,7 @@ import sys
 import subprocess
 import time
 
+from common import environment
 from common import retry
 from experiment.build import builder
 from src_analysis import change_utils
@@ -39,18 +40,19 @@ def get_make_target(fuzzer, benchmark):
 
 def stop_docker_containers():
     """Stop running docker containers."""
-    result = subprocess.run(['docker', 'ps', '-q'],
+    container_engine = environment.get_container_engine()
+    result = subprocess.run([container_engine, 'ps', '-q'],
                             stdout=subprocess.PIPE,
                             check=True)
     container_ids = result.stdout.splitlines()
     if container_ids:
         subprocess.run([
-            'docker',
+            container_engine,
             'kill',
         ] + container_ids, check=False)
 
     # To avoid dockerd process growing in size.
-    subprocess.run(['sudo', 'service', 'docker', 'restart'],
+    subprocess.run(['sudo', 'service', container_engine, 'restart'],
                    stdout=subprocess.PIPE,
                    check=True)
     time.sleep(5)
@@ -58,26 +60,29 @@ def stop_docker_containers():
 
 def delete_docker_images():
     """Delete docker images."""
+    container_engine = environment.get_container_engine()
     # TODO(metzman): Don't delete gcr.io/oss-fuzz-base/base-builder and
     # gcr.io/fuzzbench/base-image so they don't need to be pulled for every
     # target.
 
-    result = subprocess.run(['docker', 'ps', '-a', '-q'],
+    result = subprocess.run([container_engine, 'ps', '-a', '-q'],
                             stdout=subprocess.PIPE,
                             check=True)
     container_ids = result.stdout.splitlines()
     if container_ids:
-        subprocess.run(['docker', 'rm', '-f'] + container_ids, check=False)
+        subprocess.run([container_engine, 'rm', '-f'] + container_ids,
+                       check=False)
 
-    result = subprocess.run(['docker', 'images', '-a', '-q'],
+    result = subprocess.run([container_engine, 'images', '-a', '-q'],
                             stdout=subprocess.PIPE,
                             check=True)
     image_ids = result.stdout.splitlines()
     if image_ids:
-        subprocess.run(['docker', 'rmi', '-f'] + image_ids, check=False)
+        subprocess.run([container_engine, 'rmi', '-f'] + image_ids,
+                       check=False)
 
     # Needed for BUILDKIT to clear build cache & avoid insufficient disk space.
-    subprocess.run(['docker', 'builder', 'prune', '-f'], check=False)
+    subprocess.run([container_engine, 'builder', 'prune', '-f'], check=False)
 
 
 @retry.wrap(NUM_RETRIES, RETRY_DELAY, 'run_command')

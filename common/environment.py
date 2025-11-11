@@ -44,3 +44,12 @@ def set(environment_variable, value):  # pylint: disable=redefined-builtin
     value_str = str(value)
     environment_variable_str = str(environment_variable)
     os.environ[environment_variable_str] = value_str
+
+
+def get_container_engine():
+    """Returns the container engine to use (docker or podman).
+
+    Checks the CONTAINER_ENGINE environment variable. If not set,
+    defaults to 'docker'.
+    """
+    return get('CONTAINER_ENGINE', 'docker')
