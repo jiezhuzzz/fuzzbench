@@ -20,10 +20,14 @@ RUN wget https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_
  && tar xzvf docker-${DOCKER_VERSION}.tgz --strip 1 -C /usr/local/bin docker/docker \
  && rm -rf docker-${DOCKER_VERSION}.tgz
 
+# Install uv for faster package installation.
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    mv /root/.cargo/bin/uv /usr/local/bin/uv
+
 WORKDIR /fuzzbench
 
 COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
+RUN uv pip install --system -r requirements.txt
 
 COPY alembic.ini alembic.ini
 COPY analysis analysis

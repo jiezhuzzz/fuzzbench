@@ -15,13 +15,16 @@
 
 
 # Do this here because the original python3.8 gets clobbered.
-apt-get update && apt-get install python3 python3-pip -y
+apt-get update && apt-get install python3 curl -y
+
+# Install uv for faster package installation.
+curl -LsSf https://astral.sh/uv/install.sh | sh && mv /root/.cargo/bin/uv /usr/local/bin/uv
 
 # This library can end up being linked to the fuzzer but it is not in the
 # runner Dockerfile.
 apt-get remove -y libfreetype6
 
-python3.8 -m pip install ninja meson==0.56.0
+uv pip install --system ninja meson==0.56.0
 
 # Disable:
 # 1. UBSan vptr since target built with -fno-rtti.

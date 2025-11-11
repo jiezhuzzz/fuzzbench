@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(for file in /zp_vegeta/scratch_sb/jiezzz/code/fuzzbench/benchmarks/*/build.sh)",
+      "Bash(do if grep -q \"pip\" \"$file\")",
+      "Bash(then echo \"$file\")",
+      "Bash(fi)",
+      "Bash(done)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

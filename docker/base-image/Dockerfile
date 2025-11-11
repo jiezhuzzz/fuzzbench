@@ -45,9 +45,13 @@ RUN cd /tmp/ && \
     ln -s /usr/local/bin/python3 /usr/local/bin/python && \
     ln -s /usr/local/bin/pip3 /usr/local/bin/pip
 
+# Install uv for faster package installation.
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    mv /root/.cargo/bin/uv /usr/local/bin/uv
+
 # Install common python dependencies.
 COPY ./requirements.txt /tmp
-RUN pip install -r /tmp/requirements.txt
+RUN uv pip install --system -r /tmp/requirements.txt
 
 # Install dependencies required by google-cloud-cli.
 RUN apt-get update && \

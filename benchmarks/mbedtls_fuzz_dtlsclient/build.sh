@@ -15,7 +15,7 @@
 #
 ################################################################################
 
-pip3 install -r $SRC/mbedtls/scripts/basic.requirements.txt
+uv pip install --system -r $SRC/mbedtls/scripts/basic.requirements.txt
 
 # build project
 perl scripts/config.pl set MBEDTLS_PLATFORM_TIME_ALT

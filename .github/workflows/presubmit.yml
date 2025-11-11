@@ -26,17 +26,22 @@ jobs:
 
     # Copied from:
     # https://docs.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions
-    - name: Cache pip
+    - name: Cache uv
       uses: actions/cache@v2
       with:
         # This path is specific to Ubuntu.
-        path: ~/.cache/pip
+        path: ~/.cache/uv
         # Look to see if there is a cache hit for the corresponding requirements
         # file.
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        key: ${{ runner.os }}-uv-${{ hashFiles('requirements.txt') }}
         restore-keys: |
-          ${{ runner.os }}-pip-
+          ${{ runner.os }}-uv-
           ${{ runner.os }}-
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
     - name: Install dependencies
       run: |

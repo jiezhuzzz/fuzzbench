@@ -16,13 +16,16 @@
 
 FROM gcr.io/cloud-builders/gcloud
 
-RUN apt-get update && apt-get install python3-pip -y
+RUN apt-get update && apt-get install python3 curl -y
+
+# Install uv for faster package installation.
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    mv /root/.cargo/bin/uv /usr/local/bin/uv
 
 # Do this expensive step before the cache is destroyed.
-RUN pip install pip --upgrade
 COPY ./requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
-RUN pip install PyGithub==1.51
+RUN uv pip install --system -r /tmp/requirements.txt
+RUN uv pip install --system PyGithub==1.51
 
 ENV FUZZBENCH_DIR /opt/fuzzbench
 COPY . $FUZZBENCH_DIR
