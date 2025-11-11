@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install python3 curl -y
 
 # Install uv for faster package installation.
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    mv /root/.cargo/bin/uv /usr/local/bin/uv
+    mv /root/.local/bin/uv /usr/local/bin/uv
 
 # Do this expensive step before the cache is destroyed.
 COPY ./requirements.txt /tmp/requirements.txt

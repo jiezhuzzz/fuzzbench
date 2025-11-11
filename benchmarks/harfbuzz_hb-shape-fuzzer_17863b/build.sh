@@ -18,7 +18,7 @@
 apt-get update && apt-get install python3 curl -y
 
 # Install uv for faster package installation.
-curl -LsSf https://astral.sh/uv/install.sh | sh && mv /root/.cargo/bin/uv /usr/local/bin/uv
+curl -LsSf https://astral.sh/uv/install.sh | sh && mv /root/.local/bin/uv /usr/local/bin/uv
 
 # This library can end up being linked to the fuzzer but it is not in the
 # runner Dockerfile.

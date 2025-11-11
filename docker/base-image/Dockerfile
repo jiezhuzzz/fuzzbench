@@ -47,7 +47,7 @@ RUN cd /tmp/ && \
 
 # Install uv for faster package installation.
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    mv /root/.cargo/bin/uv /usr/local/bin/uv
+    mv /root/.local/bin/uv /usr/local/bin/uv
 
 # Install common python dependencies.
 COPY ./requirements.txt /tmp
