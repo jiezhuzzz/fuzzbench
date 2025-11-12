@@ -158,10 +158,16 @@ def add_bugs_covered_column(experiment_df):
         return experiment_df
     grouping2 = ['fuzzer', 'benchmark', 'trial_id']
     grouping3 = ['fuzzer', 'benchmark', 'trial_id', 'time']
-    df = experiment_df.sort_values(grouping3)
-    df['firsts'] = (
-        df.groupby(grouping2, group_keys=False).apply(is_unique_crash) &
-        ~df.crash_key.isna())
+    df = experiment_df.sort_values(grouping3).copy()
+
+    # Apply is_unique_crash and properly align the result
+    firsts_result = df.groupby(grouping2, group_keys=False).apply(is_unique_crash)
+    # Reset index to ensure proper alignment
+    if hasattr(firsts_result.index, 'levels'):
+        # MultiIndex case - flatten it
+        firsts_result = firsts_result.reset_index(level=0, drop=True)
+    df['firsts'] = firsts_result.values & ~df.crash_key.isna().values
+
     df['bugs_cumsum'] = df.groupby(grouping2)['firsts'].transform('cumsum')
     df['bugs_covered'] = (
         df.groupby(grouping3)['bugs_cumsum'].transform('max').astype(int))
