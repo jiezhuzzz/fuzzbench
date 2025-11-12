@@ -779,6 +779,13 @@ def get_pool_args(measurers_cpus, runners_cpus):
     return (measurers_cpus, _process_init, (cores_queue,))
 
 
+def get_num_trials(experiment: str) -> int:
+    """Returns the number of trials in the experiment."""
+    with db_utils.session_scope() as session:
+        return session.query(models.Trial).filter(
+            models.Trial.experiment == experiment).count()
+
+
 def measure_manager_loop(experiment: str,
                          max_total_time: int,
                          measurers_cpus=None,
@@ -788,9 +795,13 @@ def measure_manager_loop(experiment: str,
     queue and writes measured snapshots in database."""
     logger.info('Starting measure manager loop.')
     if not measurers_cpus:
-        measurers_cpus = multiprocessing.cpu_count()
-        logger.info('Number of measurer CPUs not passed as argument. using %d',
-                    measurers_cpus)
+        num_trials = get_num_trials(experiment)
+        # Allocate 2 workers per trial, capped at cpu_count()
+        # This prevents over-allocation for small experiments
+        measurers_cpus = min(max(num_trials * 2, 1), multiprocessing.cpu_count())
+        logger.info('Number of measurer CPUs not passed as argument. '
+                    'Auto-setting to %d based on %d trials (capped at %d CPUs)',
+                    measurers_cpus, num_trials, multiprocessing.cpu_count())
     with multiprocessing.Pool() as pool, multiprocessing.Manager() as manager:
         logger.info('Setting up coverage binaries')
         set_up_coverage_binaries(pool, experiment)
