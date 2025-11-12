@@ -48,8 +48,8 @@ SHELL := /bin/bash
 VENV_ACTIVATE := .venv/bin/activate
 
 ${VENV_ACTIVATE}: requirements.txt
-	python3.10 -m venv .venv || python3 -m venv .venv
-	source ${VENV_ACTIVATE} && uv pip install --upgrade pip setuptools && uv pip install -r requirements.txt
+	uv venv .venv
+	source ${VENV_ACTIVATE} && uv pip install -r requirements.txt
 
 install-dependencies: ${VENV_ACTIVATE}
 
