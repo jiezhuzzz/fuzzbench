@@ -37,7 +37,7 @@ from experiment import reporter
 from experiment import scheduler
 from experiment import stop_experiment
 
-LOOP_WAIT_SECONDS = 5 * 60
+LOOP_WAIT_SECONDS = 30  # Reduced from 5 min to 30 sec
 
 # TODO(metzman): Convert more uses of os.path.join to exp_path.path.
 
